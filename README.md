@@ -139,6 +139,6 @@ The custom branch starts from upstream revision `4a763c7cb03d95fcc7ba39dbab41727
 - **Soffizlly**: bundled audio remakes, included under upstream's permission/license.
 - **Crayon / Wii-Tac-Toe**: source of the player-one pointer sheet; see THIRD_PARTY_ASSETS.md.
 - **Outfit Project Authors**: Outfit font, SIL Open Font License 1.1.
-- **etco920's customization**: CRT overlay, dark/light configuration, corner-targeted pointer styling, and reversible install documentation, developed with AI assistance.
+- **etco920's customization**: CRT overlay, dark/light configuration, corner-targeted pointer styling, and reversible install documentation.
 
 The upstream MIT license and font/audio credits are preserved. See [LICENSE](LICENSE). Wii is a Nintendo trademark. No Wii firmware, ROMs, or game files are included.
