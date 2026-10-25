@@ -39,7 +39,7 @@
     </queries>
 
     <application
-        android:label="@string/app_name"
+        android:label="Wii CRT"
         android:icon="@mipmap/ic_launcher"
         android:banner="@drawable/banner"
         android:theme="@style/Theme.TvHome"
@@ -57,10 +57,7 @@
             android:screenOrientation="landscape">
             <!-- Not a HOME candidate: WiiMenuActivity is the only one, so Home and power-on land on it even
                  when Android drops the saved home preference. Still in the TV's own app list. -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
+
         </activity>
 
         <!-- The home screen, in the style of the old console channel menu. -->
@@ -78,7 +75,14 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
         </activity>
+
+        <activity android:name=".AppearanceSettingsActivity" android:exported="false"
+            android:screenOrientation="landscape" />
 
         <!-- The Mii channel, opened from its tile in the channel menu. Same task as the home screen, so
              Home always lands back on the menu. -->
