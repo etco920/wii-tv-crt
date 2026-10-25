@@ -42,7 +42,7 @@ For a TV that exposes ADB on its network address:
 
 ```sh
 adb connect TV_IP:PORT
-adb -s TV_IP:PORT install -r wii-tv-crt-v1.0.0.apk
+adb -s TV_IP:PORT install -r PathToAPK
 ```
 
 Some TVs expose port `5555` when USB/ADB debugging is enabled. Others use Wireless debugging: select **Pair device with pairing code**, then run:
