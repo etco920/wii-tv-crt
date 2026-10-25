@@ -8,11 +8,11 @@ android {
 
     defaultConfig {
         // Opt-in identity for firmware with a package-name HOME allowlist; see docs/devices/xiaomi-mitv-aetp0-dofus.md.
-        applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
+        applicationId providers.gradleProperty('launcherApplicationId').getOrElse('dev.wiicrt.launcher')
         minSdk 26
         targetSdk 34
-        versionCode 5
-        versionName '2.4'
+        versionCode 100
+        versionName '1.0.0-crt'
     }
 
     buildTypes {
@@ -21,7 +21,8 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Sideloaded over ADB, never published: sign with the debug key so it installs over a debug build.
+            // CI artifacts use debug signing. Public release APKs are re-signed outside the repo
+            // with the maintainer's stable private release key; see RELEASING.md.
             signingConfig signingConfigs.debug
         }
     }
