@@ -102,7 +102,9 @@ public class WiiMenuActivity extends Activity implements WiiMenuView.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WiiHand.loadPointer(getResources());
         menu = new WiiMenuView(this, this);
+        menu.setVisualOptions(VisualOptions.dark(this), VisualOptions.crt(this));
         menu.setIntroText(getString(R.string.wii_intro_title), getString(R.string.wii_intro_body),
                 getString(R.string.wii_intro_continue));
         sounds = new WiiSounds(this, getResources().getBoolean(R.bool.wii_sounds));
@@ -146,6 +148,7 @@ public class WiiMenuActivity extends Activity implements WiiMenuView.Listener {
     protected void onResume() {
         super.onResume();
         resumed = true;
+        menu.setVisualOptions(VisualOptions.dark(this), VisualOptions.crt(this));
         if (appsDirty || miiStore.version() != miiVersion) reloadApps();
         if (handPending) {
             handPending = false;
@@ -244,6 +247,10 @@ public class WiiMenuActivity extends Activity implements WiiMenuView.Listener {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (event.getRepeatCount() == 0) startActivity(new Intent(this, AppearanceSettingsActivity.class));
+            return true;
+        }
         if (menu.handleKey(event)) return true;
         return super.onKeyDown(keyCode, event);
     }
@@ -309,7 +316,7 @@ public class WiiMenuActivity extends Activity implements WiiMenuView.Listener {
         });
         int at = 0;
         while (at < channels.size() && dock.contains(channels.get(at).key)) at++;
-        channels.add(at, miiChannel());
+        channels.add(0, miiChannel());
         if (games) channels.add(at + 1, gamesChannel());
         List<String> usual = new ArrayList<>(channels.size());
         for (WiiMenuView.Channel ch : channels) usual.add(ch.key);
@@ -390,13 +397,20 @@ public class WiiMenuActivity extends Activity implements WiiMenuView.Listener {
 
     @Override
     public void onSettingsButton() {
-        open(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), true);
+        new android.app.AlertDialog.Builder(this)
+                .setTitle(R.string.wii_settings_title)
+                .setItems(new String[] {getString(R.string.wii_appearance_title), getString(R.string.wii_tv_settings)},
+                        (dialog, which) -> {
+                            if (which == 0) open(new Intent(this, AppearanceSettingsActivity.class));
+                            else open(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        }).show();
     }
 
     @Override
     public void onSdButton() {
         Intent media = getPackageManager().getLeanbackLaunchIntentForPackage(MEDIA_PLAYER);
         if (media == null) media = getPackageManager().getLaunchIntentForPackage(MEDIA_PLAYER);
+        if (media == null) media = getPackageManager().getLeanbackLaunchIntentForPackage("com.tcl.ui_mediaCenter");
         if (media == null) {
             Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
             return;
@@ -406,6 +420,15 @@ public class WiiMenuActivity extends Activity implements WiiMenuView.Listener {
 
     @Override
     public void onInputsButton() {
+        // TCL exposes only some ports through TvInputManager; its native panel lists all four.
+        try {
+            startActivity(new Intent("com.android.tv.action.VIEW_INPUTS")
+                    .setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            return;
+        } catch (RuntimeException unavailable) {
+            // Retain the standard Android TV input list as a fallback.
+        }
         List<WiiMenuView.MenuItem> items = new ArrayList<>();
         TvInputManager tim = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
         if (tim != null) {

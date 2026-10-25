@@ -12,6 +12,7 @@ public class MiiChannelActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WiiHand.loadPointer(getResources());
         view = new MiiChannelView(this, () -> {
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

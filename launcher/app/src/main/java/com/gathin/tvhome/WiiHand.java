@@ -1,6 +1,8 @@
 package com.gathin.tvhome;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -8,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 
 /**
@@ -15,6 +18,15 @@ import android.graphics.Typeface;
  * fingertip; s is screen px per 1920-wide reference px.
  */
 final class WiiHand {
+    private static Bitmap pointerSheet;
+    private final Rect pointerFrame = new Rect(0, 0, 96, 96);
+
+    static synchronized void loadPointer(Resources resources) {
+        if (pointerSheet != null) return;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        pointerSheet = BitmapFactory.decodeResource(resources, R.drawable.wii_pointer_sheet, options);
+    }
     /** The hand was first drawn in units of 1/1024 of the width. */
     private static final float UNIT = 1920f / 1024f;
 
@@ -33,6 +45,8 @@ final class WiiHand {
     boolean grabbing;
 
     WiiHand(Typeface bold) {
+        blur.setColorFilter(new PorterDuffColorFilter(0xFF000000, PorterDuff.Mode.SRC_IN));
+        blur.setAlpha(70);
         stroke.setStyle(Paint.Style.STROKE);
         stroke.setStrokeJoin(Paint.Join.ROUND);
         stroke.setStrokeCap(Paint.Cap.ROUND);
@@ -87,6 +101,18 @@ final class WiiHand {
 
     void draw(Canvas c, float x, float y) {
         if (hand == null) return;
+        if (pointerSheet != null && (!grabbing || grab == null)) {
+            int save = c.save();
+            c.rotate(-22f, x, y);
+            float k = 2.6f * s;
+            dst.set(x - 48f * k, y - 41f * k, x + 48f * k, y + 55f * k);
+            dst.offset(4f * s, 6f * s);
+            c.drawBitmap(pointerSheet, pointerFrame, dst, blur);
+            dst.offset(-4f * s, -6f * s);
+            c.drawBitmap(pointerSheet, pointerFrame, dst, bmp);
+            c.restoreToCount(save);
+            return;
+        }
         float u = UNIT * s;
         if (point != null) {
             drawSprite(c, x, y, u);
@@ -135,6 +161,13 @@ final class WiiHand {
 
     /** What draw(x, y) covers, shadow and badge included. */
     void bounds(float x, float y, RectF out) {
+        if (pointerSheet != null && (!grabbing || grab == null)) {
+            float k = 2.6f * s;
+            out.set(x - 48f * k, y - 41f * k, x + 48f * k + 4f * s, y + 55f * k + 6f * s);
+            matrix.setRotate(-22f, x, y);
+            matrix.mapRect(out);
+            return;
+        }
         float u = UNIT * s;
         if (point == null) {
             matrix.setRotate(-8f);

@@ -54,6 +54,8 @@ final class MiiChannelView extends View {
     private final float[] target = new float[2];
     private final RectF rr = new RectF();
     private final Paint veil = new Paint();
+    private final CrtOverlay crt = new CrtOverlay();
+    private boolean crtEnabled = true;
     private final Paint bmp = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
 
     private MiiEditor editor;
@@ -150,6 +152,7 @@ final class MiiChannelView extends View {
     // ---- lifecycle --------------------------------------------------------------------------------------
 
     void resume() {
+        crtEnabled = VisualOptions.crt(getContext());
         running = true;
         lastNanos = 0;
         audio.setCalm(editor != null);
@@ -459,6 +462,7 @@ final class MiiChannelView extends View {
             veil.setAlpha(Math.round(255 * fade));
             c.drawRect(0, 0, getWidth(), getHeight(), veil);
         }
+        if (crtEnabled) crt.draw(c, getWidth(), getHeight());
         if (running) postInvalidateOnAnimation();
         else lastNanos = 0;
     }

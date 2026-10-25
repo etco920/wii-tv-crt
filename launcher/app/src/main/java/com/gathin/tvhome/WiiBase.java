@@ -10,6 +10,20 @@ package com.gathin.tvhome;
 final class WiiBase {
     private WiiBase() {}
 
+    /** Recolor generated chrome once off the UI thread; never touches app logo pixels. */
+    private static int[] nightPixels(int[] pixels) {
+        for (int i = 0; i < pixels.length; i++) {
+            int c = pixels[i], a = c >>> 24;
+            int r = (c >>> 16) & 255, g = (c >>> 8) & 255, b = c & 255;
+            if (b > r + 20 && g > r + 20) continue; // Wii blue rings and dividing line.
+            r = 10 + Math.round(r * 0.09f);
+            g = 15 + Math.round(g * 0.10f);
+            b = 22 + Math.round(b * 0.12f);
+            pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+        }
+        return pixels;
+    }
+
     static final float CX = 959.5f;
     static final float LINE_TOP = 783.36f;
     static final float LINE_BOTTOM = 898.48f;
@@ -112,7 +126,7 @@ final class WiiBase {
         return delta;
     }
 
-    static int[] backdrop(int w, int h) {
+    static int[] backdrop(int w, int h, boolean dark) {
         float s = w / 1920f;
         int[] out = new int[w * h];
         float[] colLine = new float[w], colCos = new float[w], colBase = new float[w], colAmp = new float[w];
@@ -165,14 +179,14 @@ final class WiiBase {
                 out[row + x] = 0xFF000000 | (clamp255(r) << 16) | (clamp255(g) << 8) | clamp255(b);
             }
         }
-        return out;
+        return dark ? nightPixels(out) : out;
     }
 
     /**
      * One round button's body and blue ring, centred in a size x size square (size in screen px), transparent
      * outside the ring. Lit from the upper left with a soft gloss, as both buttons are.
      */
-    static int[] button(int size, float s) {
+    static int[] button(int size, float s, boolean dark) {
         int[] out = new int[size * size];
         float c = size / 2f;
         for (int y = 0; y < size; y++) {
@@ -196,11 +210,11 @@ final class WiiBase {
                 out[y * size + x] = (a << 24) | (clamp255(cr) << 16) | (clamp255(cg) << 8) | clamp255(cb);
             }
         }
-        return out;
+        return dark ? nightPixels(out) : out;
     }
 
     /** The frosted grey an empty channel slot shows: darker at the top, faint horizontal grain. */
-    static int[] emptySlot(int tw, int th, float s) {
+    static int[] emptySlot(int tw, int th, float s, boolean dark) {
         int[] out = new int[tw * th];
         for (int y = 0; y < th; y++) {
             float t = y / (float) Math.max(1, th - 1);
@@ -214,7 +228,7 @@ final class WiiBase {
                 out[y * tw + x] = 0xFF000000 | (v << 16) | (v << 8) | v;
             }
         }
-        return out;
+        return dark ? nightPixels(out) : out;
     }
 
     private static int hash(int x, int y) {
