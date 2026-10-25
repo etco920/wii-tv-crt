@@ -23,3 +23,9 @@ launcher/replay_pid*.log
 *.aab
 
 .DS_Store
+
+# Private release signing material must never be committed.
+*.jks
+*.keystore
+signing.properties
+release-signing/

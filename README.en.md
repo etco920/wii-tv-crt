@@ -1,142 +1,144 @@
-# wii-tv
+# Wii TV CRT
 
-The Wii channel menu as the home screen of your Android TV.
+A Wii-style home screen for Android TV and Google TV, with **CRT on/off** and **dark/light mode** you can change using your TV remote.
 
-![wiiOS on a Philips 65PUD7906](docs/wii-menu.jpg)
+This is a fork of [MauroProto/wii-tv](https://github.com/MauroProto/wii-tv), built on Gathin's [cleanyourtv](https://github.com/Gathin23/cleanyourtv). It is a customized Android launcher, not replacement TV firmware. Google TV and your streaming apps still run normally.
 
-wii-tv replaces the home screen of an Android TV with a menu in the style of the Wii Menu: twelve channels to a page, the segment clock, the date, the round buttons, a pointing hand that follows your selection and sounds as you move. Each channel is one of your apps, with its own banner. When the TV turns on, a white notice screen comes up, as on the console, and OK takes you to the menu.
+**[Download the latest release](https://github.com/etco920/wii-tv-crt/releases/latest)** · [Original upstream documentation](UPSTREAM.md)
 
-Shown on X: [I put the Wii interface on my TV](https://x.com/ProtoMauro/status/2112776289312555195) (in Spanish).
+## Appearance choices
 
-Español: [README.md](README.md)
+Open the round **wiiOS** button at the bottom left, then choose **Appearance**. A remote with a Menu button can open Appearance directly.
 
-## Disclaimer
+| Setting | On | Off |
+| --- | --- | --- |
+| CRT screen effect | Scanlines, a subtle RGB phosphor texture, and an edge vignette over the whole launcher, including app logos | Clean picture with no CRT overlay |
+| Dark mode | Charcoal-blue menu chrome with pale clock/date text and blue highlights | The original light Wii-style menu chrome |
 
-wii-tv is a fan project. It is not affiliated with or endorsed by Nintendo. "Wii" is a trademark of Nintendo.
+The switches are independent: dark CRT, dark clean, light CRT, and light clean all work. Choices save automatically and survive restarting the app. Press Back to return to the menu. Logos keep their own artwork and colors. CRT also applies inside the Mii channel; dark/light changes the main menu chrome. Streaming apps retain their own appearance after opening.
 
-The repository includes no files extracted from Nintendo. The interface is drawn in code (`WiiMenuView`, `WiiBase`, `WiiPalette`). The 7 bundled effects and 3 music tracks are original remakes contributed by Soffizlly; see [audio and credits](tools/sounds/README.md).
-
-## Features
-
-- **Channels**: 4 columns by 3 rows per page. The first column of the next page shows at the right edge, and the arrows turn the page. Your apps fill the channels; the rest stay empty. Opening a channel grows the app out of its frame, as on the console. To move a channel, hold OK on it and carry it with the arrows; OK puts it down and the TV keeps the order.
-- **Clock and date**: a segment clock, 12-hour with AM/PM or 24-hour to match the TV's time format, and the short date in the TV's language.
-- **Bottom buttons**:
-  - **wiiOS** (left) opens Android TV Settings.
-  - **SD** opens the TV's media player (USB drives).
-  - **Envelope** (right) lists the HDMI inputs and live TV.
-- **Pointing hand** that follows the selected channel or button. Back from an app, it is where you left it, even if Android closed the menu to free memory.
-- **Mii Channel**: the first channel. The plaza with your Miis walking around on the squared floor, the side buttons (edit, new, delete, help, parade, mail), the whistle that lines them up by name, favourite, colour or gender, and the editor to make and change them. Miis are saved on the TV. On its own everything is drawn in code; with the channel pack it uses the original faces, hair, icons and sounds. The repository does not include those files: [`tools/miipack`](tools/miipack/README.md) (in Spanish) fetches them from their public pages and builds the pack on your computer.
-- **Games channel**: next to the Mii Channel. Its tile is a pixel-art meadow with a little blue runner hopping over rocks for gems. Inside, your games are cartridges on a shelf: pick one, press **Play** and it starts in [RetroArch](https://www.retroarch.com) (Game Boy, Game Boy Color, Game Boy Advance, NES, Super Nintendo and Neo Geo). The **RetroArch** button opens its settings. The repository ships no games; see [Games](#games).
-- **Sounds** for moving, opening, turning the page, opening the inputs list and leaving the notice screen. They follow the TV volume.
-- **Bundled audio**: 7 effects and 3 music tracks for Home, Mii Plaza and the editor. The jingle starts first; menu music enters one second later. No separate audio installation is needed.
-- **Notice screen** at power-on. OK or the arrows close it, or it leaves by itself after 12 seconds. It does not come back when you leave an app.
-- **Always starts on the menu**: turning the TV on brings the menu back even if another app was open.
-- Clock screensaver (optional).
-
-Tested on a Philips 65PUD7906/77 (Android TV 11, 1920 x 1080). It should work on any Android TV 8.0 or later with a 16:9 screen.
+The player-one pointer uses the same Wii-style sprite as the original TV customization, tilted toward the selected channel's lower-right corner. See [asset credits](THIRD_PARTY_ASSETS.md) for the sprite source; the upstream code license does not imply a separate license grant for that artwork.
 
 ## Requirements
 
-- A macOS or Linux computer on the same network as the TV. Windows works for the install too (see step 5).
-- Python 3.10 or later.
-- JDK 17 and the Android SDK with `platforms;android-34` and `build-tools;34.0.0`. Android Studio ships both; on macOS, `brew install openjdk@17 android-commandlinetools` also works.
-- Debugging turned on on the TV (step 1).
+- Android TV / Google TV 8.0 or newer, with a 16:9 display.
+- A remote with arrows, OK, Back, and Home.
+- A way to sideload an APK. A computer with Google's [Android platform tools](https://developer.android.com/tools/releases/platform-tools) is one option.
 
-## Install
+The customization was developed and checked on a TCL 65QM6K running Android 14 at a 1080p UI resolution. Other models may handle Home and HDMI switching differently. This is a fan project, not affiliated with Nintendo, Google, or TCL.
 
-Run every command from the repository folder, and replace `192.168.1.50` with your TV's IP address.
+## Install the ready-made APK
 
-1. **Turn on debugging.** Settings → Device Preferences → About: select **Build** seven times. Then Settings → Device Preferences → Developer options: turn on **USB debugging**, and **Network debugging** or **ADB over network** if your TV has it. Note the TV's IP address under Settings → Network & Internet.
-2. **Set up the tools.**
-   ```sh
-   git clone https://github.com/MauroProto/wii-tv.git
-   cd wii-tv
-   python3 -m venv tools/venv
-   tools/venv/bin/pip install -r tools/requirements.txt
-   TV_HOST=192.168.1.50 tools/venv/bin/python tools/tv.py --probe
-   ```
-   The first time, the TV asks whether to allow debugging. Tick "Always allow from this computer" and accept. The key that authorises your computer is kept in `tools/adbkey/`; git ignores it. Do not share it.
-3. **Back up.** `TV_HOST=192.168.1.50 tools/backup.sh` saves the app lists, the current home screen, the settings and a screenshot to `backups/<model>/<date>/`. Git ignores that folder because it holds the TV's serial number and network names.
-4. **(Optional) Disable vendor apps.** `TV_HOST=192.168.1.50 tools/disable.sh examples/philips-65pud7906/debloat.txt`. Apps are disabled, not uninstalled. Review the list first and put `#` in front of anything you want to keep. For other brands, [cleanyourtv](https://github.com/Gathin23/cleanyourtv/tree/main/examples) has more than a hundred tested lists.
-5. **Install the menu.** `TV_HOST=192.168.1.50 launcher/build-and-install.sh` builds the app, installs it, checks that it starts, disables the stock launcher and makes **wiiOS** the home screen. If anything goes wrong, it turns the stock launcher back on. On Windows: `powershell -ExecutionPolicy Bypass -File launcher\build-and-install.ps1 -TvHost 192.168.1.50`.
-6. **Close debugging when you are done.** Turn USB and network debugging off in Developer options (optionally "Revoke USB debugging authorisations"), restart the TV, and check with `tools/venv/bin/python tools/adb-closed.py 192.168.1.50`.
+1. Download `wii-tv-crt-v1.0.0.apk` from **Releases**, plus the checksum if you want to verify the download.
+2. Transfer it to the TV and install it with a file manager, or use the computer method below.
+3. Open **Wii CRT** from the TV's app list. It can be tried as an ordinary app before changing Home behavior.
+4. Open **wiiOS → Appearance** to select CRT and dark/light mode.
 
-## Remote
+### Install from a computer
 
-| Key | Action |
-| --- | --- |
-| Arrows | Move the hand. Right from the last column turns the page; down from the bottom row goes to the buttons. |
-| CH+ / CH- | Turn the page (fast-forward and rewind too). |
-| OK | Opens the selected channel or button. |
-| Hold OK | Picks the channel up to move it: the arrows swap it with the next one, and OK or Back put it down. |
-| Back | Closes the inputs list or the notice screen. |
-| Home | Back to the menu. On the menu, back to the first page. |
+Enable Developer options on the TV: Settings → System → About → select **Android TV OS build** seven times. Then enable USB/ADB debugging or Wireless debugging, depending on what your TV offers. The TV and computer must share a network.
 
-## Games
-
-The Games channel starts your games in RetroArch. Only use games you own: dump your own cartridges with a cartridge reader (GB Operator, GBxCart RW or the Open Source Cartridge Reader, for example).
-
-| Console | Files | RetroArch core |
-| --- | --- | --- |
-| Game Boy, Game Boy Color and Game Boy Advance | `.gb`, `.gbc`, `.gba` | Nintendo - Game Boy Advance (mGBA) |
-| NES | `.nes` | Nintendo - NES / Famicom (FCEUmm) |
-| Super Nintendo | `.sfc`, `.smc` | Nintendo - SNES / SFC (Snes9x 2010) |
-| Neo Geo | `.zip` | Arcade (FinalBurn Neo) |
-
-1. **Install RetroArch on the TV.** Most Android TVs are 32-bit and need `RetroArch_ra32.apk` from the [RetroArch downloads page](https://www.retroarch.com/?page=platforms). Open it once and get the cores for your consoles in Online Updater → Core Downloader. Leave with Home.
-2. **Set it up for the TV remote** (once): `TV_HOST=192.168.1.50 tools/venv/bin/python tools/games/add.py --setup`. It adds the button maps in `tools/games/retroarch/` and changes a few RetroArch settings: OK chooses and Back goes back, holding red opens its menu, and games save every 10 seconds. The previous settings are kept in `retroarch.cfg.before-wii-tv` in RetroArch's folder on the TV. For a Bluetooth gamepad, also run Online Updater → Update Controller Profiles in RetroArch. If you set it up with an earlier wii-tv, run it again: the button map changed.
-3. **Add your games**: `TV_HOST=192.168.1.50 tools/venv/bin/python tools/games/add.py "My game.gba" --title "My game"`. It copies the file to `RetroArch/roms/` on the TV and puts it on the shelf. `--color "#E8432E"` sets the label colour, `--list` shows the games, and `--remove "My game"` takes one off (`--delete` also deletes its file from the TV).
-
-**Neo Geo.** Each game is a FinalBurn Neo `.zip` set (`mslug.zip`, for example) and needs the Neo Geo BIOS, `neogeo.zip`, which wii-tv does not ship. The sets must match the FinalBurn Neo version in your RetroArch, or the game will not start: `TV_HOST=192.168.1.50 tools/venv/bin/python tools/games/add.py --bios neogeo.zip`, then `TV_HOST=192.168.1.50 tools/venv/bin/python tools/games/add.py mslug.zip --system neogeo --title "Metal Slug"`.
-
-In a game, the TV remote's arrows are the D-pad, OK is A, Back is B, and red, green, yellow and blue are Start, Select, Y and X (on the Game Boy Advance yellow and blue are L and R; on the Neo Geo green is the coin and yellow and blue are C and D). Super Nintendo games that use L and R need a gamepad. Hold red for two seconds for RetroArch's menu (save, load or close the game). Home goes back to the Wii Menu with the game paused; choose it again to carry on. Choosing another game, or the channel's RetroArch button, closes the open one, and in-game saves reach the file within 10 seconds, so wait a moment before switching. The button map is for Philips TV remotes ("MStar Smart TV IR Receiver"); for another remote, map it in RetroArch → Settings → Input.
-
-## Bundled audio
-
-The APK includes the remakes contributed by Soffizlly: 7 effects and 3 music tracks. They work immediately after installation, without downloading files or running extra tools.
-
-After the notice screen closes, the jingle plays first and looping menu music starts one second later. Mii Plaza and the editor have separate tracks. Music pauses when its screen leaves the foreground and respects audio focus.
-
-The wiiOS, SD and envelope buttons and the Mii Channel panels share `wii_big_buttons.ogg`. `wii_woop.ogg` plays once after the cursor stays on a channel for 500 ms. Navigation, opening a panel or leaving Home cancels the countdown. Change `wii_hover_delay_ms` in `config.xml` to adjust it; `0` disables it.
-
-Assets are in `launcher/app/src/main/res/raw/`: effects and menu music in OGG Vorbis, Plaza and editor music in Opus. See the [audio map and credits](tools/sounds/README.md). To use your own music, see [Your own music](#your-own-music).
-
-### Your own music
-
-The menu can play your own music instead of the bundled track. Add it with `tools/music/add.py`, which needs [ffmpeg](https://ffmpeg.org) on your computer:
+For a TV that exposes ADB on its network address:
 
 ```sh
-TV_HOST=192.168.1.50 tools/venv/bin/python tools/music/add.py music.flac --start jingle.flac --loop 12.5 48
+adb connect TV_IP:PORT
+adb -s TV_IP:PORT install -r wii-tv-crt-v1.0.0.apk
 ```
 
-`--loop START END` is in seconds: the music plays to END and carries on from START, over and over. The second and a half before END fades into what plays just before START, so the jump is not heard (`--crossfade` sets how long). Without `--loop` the whole file repeats. `--start` is optional: a jingle that takes the place of the menu's own start sound; the music comes in a second later, as with the bundled track. It reads what ffmpeg reads (mp3, flac, ogg, m4a, wav) and stores it on the TV as WAV, in wiiOS's folder; with `adb` installed (or `ADB=/path/to/adb`) the copy takes a second. `--remove` takes your music off and brings the bundled track back, and `--out folder` only writes the files.
+Some TVs expose port `5555` when USB/ADB debugging is enabled. Others use Wireless debugging: select **Pair device with pairing code**, then run:
 
-## Customise
+```sh
+adb pair TV_IP:PAIRING_PORT
+```
 
-Change what you like and run `launcher/build-and-install.sh` again.
+Enter the code shown on the TV. Press Back to the main Wireless debugging page and use its **connection** address and port for `adb connect`. The pairing port and connection port are different. Accept the TV's debugging authorization if asked. Replace the placeholders with your own TV's details.
 
-| What | Where |
+You can also launch it directly:
+
+```sh
+adb -s TV_IP:PORT shell am start -n dev.wiicrt.launcher/com.gathin.tvhome.WiiMenuActivity
+```
+
+This installer does not remove apps, erase app data, disable Google TV, or change your picture brightness. The inherited upstream `build-and-install` and debloating scripts target the upstream package and are not this fork's installation method; use the release APK steps above.
+
+## Make Home open Wii CRT (optional)
+
+First use Android's **Default apps → Home app** setting if your TV offers it. Choose Wii CRT.
+
+On Google TVs that keep redirecting Home to the stock launcher, an optional service is included:
+
+1. Open Android **Settings → Accessibility**.
+2. Enable **Home button** belonging to **Wii CRT**.
+3. Press Home and check that Wii CRT opens.
+
+This fork's service receives only window-change events from Google's TV launchers. It cannot retrieve screen contents or filter keystrokes. It detects the stock home app and opens the Wii menu. Google's launcher remains enabled and may briefly appear during the redirect. It does not replace Android or remove Google services.
+
+### TCL: Home works until a full restart
+
+Some TCL firmware separately blocks automatic startup. If the service is enabled but fails after reboot, inspect its app-specific permission:
+
+```sh
+adb -s TV_IP:PORT shell appops get dev.wiicrt.launcher
+```
+
+If this reports `AUTO_START: ignore`, allow that one permission and explicitly save it:
+
+```sh
+adb -s TV_IP:PORT shell appops set dev.wiicrt.launcher AUTO_START allow
+adb -s TV_IP:PORT shell appops write-settings
+```
+
+Some firmware calls the same permission `APP_AUTO_START`; use the name your device actually reports. Then toggle the Wii CRT service off/on in Accessibility and restart the TV to verify it. If neither permission exists, stop and use the TV's own startup settings. Do not disable setup/recovery or other system components to work around this.
+
+Once setup is verified, debugging can be switched off again. It is not required for normal use.
+
+## Remote controls
+
+| Button | Action |
 | --- | --- |
-| Which apps come first, in what order | `dock_apps` in `launcher/app/src/main/res/values/config.xml` (package names; the rest follow alphabetically) |
-| Apps that never get a channel | `hidden_apps`, same file |
-| Left button text | `wii_settings_label` (default `wiiOS`) |
-| Sounds on or off | `wii_sounds` |
-| Music on or off (menu, Mii Plaza and editor) | `wii_music` |
-| Music volume | `wii_music_volume`, in percent of the file's own level (default 100); the Plaza and the editor play at 40 % of it |
-| Live TV app in the inputs list | `live_tv_package` |
-| Notice screen text | `wii_intro_title`, `wii_intro_body`, `wii_intro_continue` in `res/values*/strings.xml` |
-| Bundled audio | `launcher/app/src/main/res/raw/`; see `tools/sounds/README.md`. The legacy generator writes alternatives to `tools/sounds/build/`. |
-| Colours, sizes, positions | Constants at the top of `WiiMenuView.java`; backdrop and panels in `WiiBase.java` and `WiiPalette.java` |
-| App behind the SD button | `MEDIA_PLAYER` in `WiiMenuActivity.java` |
-| Games channel on or off | `games_channel` in `config.xml`; with the channel, RetroArch gets no channel of its own |
+| Arrows | Move the pointer; right at the page edge changes pages |
+| OK | Open the selected app channel or button |
+| Hold OK | Pick up a channel, move it, and press OK to drop it |
+| Channel + / − | Change pages |
+| Menu, if present | Open Appearance |
+| wiiOS button | Appearance or Android TV settings |
+| SD button | TV media player, where supported |
+| Envelope button | Inputs; uses TCL's native source selector on TCL TVs |
+| Home | Return to the launcher if selected as Home or the optional service is enabled |
+
+## Performance
+
+The release is built with the upstream R8/resource optimizations. The menu keeps idle live tiles to about 20 FPS, retains normal navigation animation scheduling, and stops scheduling new frames when hidden. The CRT overlay uses cached textures/gradients with no blur, frame capture, or independent animation timer. Turn CRT off for the lowest rendering cost.
+
+A custom launcher is not a guaranteed system-wide speedup. Streaming app performance, buffering, and HDMI input lag are separate. The CRT effect adds some rendering work.
 
 ## Undo
 
-`TV_HOST=192.168.1.50 tools/restore.sh examples/philips-65pud7906/debloat.txt com.google.android.tvlauncher` turns the disabled apps back on and returns Home to the stock launcher (on Google TV the last argument is `com.google.android.apps.tv.launcherx`). Then `tools/venv/bin/python tools/tv.py 'pm uninstall com.gathin.tvhome'` removes wiiOS.
+If you enabled the Home service, turn it off under Android Accessibility. Restore your previous default Home app if you changed it. Then uninstall **Wii CRT** normally through Android Apps settings. Your original apps and their data are untouched.
 
-## Credits and licence
+The package is `dev.wiicrt.launcher`, separate from upstream `com.gathin.tvhome`. An upstream or private-customization APK cannot be installed over it as an update.
 
-- Built on [cleanyourtv](https://github.com/Gathin23/cleanyourtv) by Gathin (MIT): the ADB tools, the disable and restore scripts, and the base of the launcher.
-- Outfit typeface, SIL Open Font License 1.1 (`launcher/FONT-LICENSE-OFL.txt`).
-- Audio remakes: Soffizlly (2026), included with permission under the repository MIT licence.
-- MIT licence: see [LICENSE](LICENSE).
+## Build and contribute
+
+Use JDK 17+, Android SDK 34/build-tools 34.0.0, and the included Gradle wrapper:
+
+```sh
+git clone --branch crt-dark-mode https://github.com/etco920/wii-tv-crt.git
+cd wii-tv-crt/launcher
+./gradlew --no-daemon testReleaseUnitTest lintRelease assembleRelease
+```
+
+On Windows use `gradlew.bat`. Point `ANDROID_HOME` or an untracked `launcher/local.properties` at your SDK. Output: `launcher/app/build/outputs/apk/release/app-release.apk`. Local/CI builds are debug-signed; see [RELEASING.md](RELEASING.md) for stable signed releases.
+
+The custom branch starts from upstream revision `4a763c7cb03d95fcc7ba39dbab41727df12d4d35`. Upstream history is retained. Newer upstream work remains on `main`; this branch is the tested CRT customization.
+
+## Credits and license
+
+- **MauroProto**: wii-tv and its Wii-style interface, Mii channel, and supporting tools.
+- **Gathin**: cleanyourtv, the original launcher base and tools.
+- **Soffizlly**: bundled audio remakes, included under upstream's permission/license.
+- **Crayon / Wii-Tac-Toe**: source of the player-one pointer sheet; see THIRD_PARTY_ASSETS.md.
+- **Outfit Project Authors**: Outfit font, SIL Open Font License 1.1.
+- **etco920's customization**: CRT overlay, dark/light configuration, corner-targeted pointer styling, and reversible install documentation, developed with AI assistance.
+
+The upstream MIT license and font/audio credits are preserved. See [LICENSE](LICENSE). Wii is a Nintendo trademark. No Wii firmware, ROMs, or game files are included.
