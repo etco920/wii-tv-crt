@@ -168,7 +168,7 @@
     <string name="home_title" translatable="false">lainOS</string>
     <!-- Animated dither backdrop (DitherView, OpenGL ES 3): noise waves quantised through a Bayer matrix,
          the wave colour drifting round the hue wheel. Replaces the ambient glow. -->
-    <bool name="dither_background">true</bool>
+    <bool name="dither_background">false</bool>
     <!-- Size of one dither cell, in dp. -->
     <integer name="dither_pixel_size">2</integer>
     <!-- Seconds for the wave colour to go once round the hue wheel. -->
@@ -187,8 +187,8 @@
          menu's. -->
     <bool name="wii_music">true</bool>
     <!-- Music level in percent: 0 to 100 for bundled music; external WAVs allow up to 200. -->
-    <integer name="wii_music_volume">100</integer>
+    <integer name="wii_music_volume">20</integer>
     <!-- The Games channel after the Mii channel: games from games.txt (tools/games/add.py) started in RetroArch,
          whose own tile it then hides. -->
-    <bool name="games_channel">true</bool>
+    <bool name="games_channel">false</bool>
 </resources>
