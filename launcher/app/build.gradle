@@ -11,8 +11,8 @@ android {
         applicationId providers.gradleProperty('launcherApplicationId').getOrElse('dev.wiicrt.launcher')
         minSdk 26
         targetSdk 34
-        versionCode 100
-        versionName '1.0.0-crt'
+        versionCode 101
+        versionName '1.0.1-crt'
     }
 
     buildTypes {
